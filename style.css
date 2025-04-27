@@ -1,0 +1,607 @@
+/* Global Variables & Base Styles */
+:root {
+  --bg-color-light: #f0f4f8;
+  --text-color-light: #333;
+  --primary-color-light: #0056b3;
+  /* Darker blue */
+  --secondary-color-light: #e9ecef;
+  /* Light gray */
+  --border-color-light: #ccc;
+  --box-bg-light: #fff;
+  --box-border-light: #ddd;
+  --box-text-light: #222;
+  --input-border-light: #ccc;
+  --input-bg-light: #fff;
+  --button-bg-light: var(--primary-color-light);
+  --button-text-light: #fff;
+  --button-hover-bg-light: #004085;
+  /* Even darker blue */
+  --tab-bg-light: var(--secondary-color-light);
+  --tab-text-light: var(--text-color-light);
+  --tab-active-bg-light: var(--primary-color-light);
+  --tab-active-text-light: #fff;
+  --error-color: #dc3545;
+  /* Red */
+  --success-color: #28a745;
+  /* Green */
+  --focus-outline-color: #007bff;
+  /* Blue outline */
+  --loader-color: var(--primary-color-light);
+
+  /* Fluid Typography Variable (Adjusted by JS slider) */
+  --base-font-scale: 1;
+  /* Default 100% */
+
+  /* Base font size using clamp for fluid typography */
+  /* Adjust min/max values as needed. calc adds the JS scale factor */
+  font-size: clamp(1rem, calc(1rem * var(--base-font-scale)), 1.5rem);
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+  --bg-color-light: #121212;
+  /* Dark background */
+  --text-color-light: #e0e0e0;
+  /* Light text */
+  --primary-color-light: #bb86fc;
+  /* Purple */
+  --secondary-color-light: #333;
+  /* Darker gray */
+  --border-color-light: #555;
+  --box-bg-light: #1e1e1e;
+  /* Very dark gray */
+  --box-border-light: #444;
+  --box-text-light: #e0e0e0;
+  /* Light text */
+  --input-border-light: #555;
+  --input-bg-light: #2c2c2c;
+  /* Dark gray */
+  --button-bg-light: var(--primary-color-light);
+  --button-text-light: #121212;
+  /* Dark text for contrast */
+  --button-hover-bg-light: #9e5fff;
+  /* Lighter purple */
+  --tab-bg-light: var(--secondary-color-light);
+  --tab-text-light: var(--text-color-light);
+  --tab-active-bg-light: var(--primary-color-light);
+  --tab-active-text-light: #121212;
+  /* Dark text for contrast */
+  --loader-color: var(--primary-color-light);
+}
+
+/* Apply theme variables */
+body {
+  font-family: 'Noto Nastaliq Urdu', sans-serif;
+  direction: rtl;
+  background-color: var(--bg-color-light);
+  color: var(--text-color-light);
+  margin: 0;
+  padding: 20px;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  /* Smooth theme transition */
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  /* Align items to the top */
+  overflow-y: auto;
+  /* Allow scrolling */
+}
+
+.calculator {
+  background-color: var(--box-bg-light);
+  /* Use box-bg for calculator body */
+  color: var(--box-text-light);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+header h1 {
+  color: var(--primary-color-light);
+  margin-top: 0;
+  font-size: clamp(1.8rem, calc(2rem * var(--base-font-scale)), 2.5rem);
+  transition: color 0.3s ease, font-size 0.3s ease;
+}
+
+header p {
+  margin-bottom: 20px;
+  font-size: clamp(1rem, calc(1.1rem * var(--base-font-scale)), 1.3rem);
+  transition: color 0.3s ease, font-size 0.3s ease;
+}
+
+header a {
+  color: var(--primary-color-light);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+header a:hover,
+header a:focus-visible {
+  text-decoration: underline;
+  color: var(--button-hover-bg-light);
+}
+
+/* Controls Area */
+.controls {
+  display: flex;
+  flex-direction: column;
+  /* Stack controls vertically on small screens */
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding: 15px;
+  background-color: var(--secondary-color-light);
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+@media (min-width: 600px) {
+  .controls {
+    flex-direction: row;
+    /* Arrange controls horizontally on larger screens */
+    justify-content: space-around;
+  }
+}
+
+.controls>div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controls label {
+  font-size: clamp(0.9rem, calc(1rem * var(--base-font-scale)), 1.2rem);
+  transition: font-size 0.3s ease;
+}
+
+
+/* Form Styling */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+form label {
+  text-align: right;
+  font-weight: bold;
+  font-size: clamp(1rem, calc(1.1rem * var(--base-font-scale)), 1.3rem);
+  transition: font-size 0.3s ease;
+}
+
+form input[type="number"] {
+  padding: 12px 15px;
+  border: 1px solid var(--input-border-light);
+  border-radius: 6px;
+  font-size: clamp(1rem, calc(1.1rem * var(--base-font-scale)), 1.3rem);
+  background-color: var(--input-bg-light);
+  color: var(--box-text-light);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease, font-size 0.3s ease;
+  width: 100%;
+  /* Make input take full width */
+  box-sizing: border-box;
+  /* Include padding and border in element's total width */
+}
+
+form input[type="number"]::placeholder {
+  color: var(--text-color-light);
+  /* Adjust placeholder color */
+  opacity: 0.7;
+}
+
+/* Input Validation Styles */
+form input[type="number"]:invalid:not(:placeholder-shown) {
+  border-color: var(--error-color);
+  box-shadow: 0 0 5px rgba(var(--error-color), 0.5);
+}
+
+form input[type="number"].error {
+  border-color: var(--error-color);
+  box-shadow: 0 0 8px rgba(var(--error-color), 0.7);
+  animation: shake 0.5s ease-in-out;
+}
+
+form input[type="number"]:valid:not(:placeholder-shown) {
+  border-color: var(--success-color);
+  box-shadow: 0 0 5px rgba(var(--success-color), 0.5);
+}
+
+
+form button[type="submit"],
+.theme-toggle button {
+  background-color: var(--button-bg-light);
+  color: var(--button-text-light);
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: clamp(1.1rem, calc(1.2rem * var(--base-font-scale)), 1.4rem);
+  transition: background-color 0.3s ease, transform 0.1s ease, font-size 0.3s ease;
+  /* Add a slight lift/press effect on hover/active */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+form button[type="submit"]:hover,
+form button[type="submit"]:focus-visible,
+.theme-toggle button:hover,
+.theme-toggle button:focus-visible {
+  background-color: var(--button-hover-bg-light);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+form button[type="submit"]:active,
+.theme-toggle button:active {
+  transform: scale(0.98);
+  /* Slightly shrink when pressed */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Accessibility: Focus States */
+/* Use :focus-visible for better accessibility */
+*:focus-visible {
+  outline: 3px solid var(--focus-outline-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+  /* Match element corners */
+  /* Advanced Focus Animation (Pulse) */
+  animation: focus-pulse 1.5s infinite alternate ease-in-out;
+}
+
+/* Remove default outline for click (if needed, but focus-visible is better) */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+
+/* Tabs Styling */
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+  background-color: var(--secondary-color-light);
+  border-radius: 8px;
+  padding: 8px;
+  gap: 5px;
+  transition: background-color 0.3s ease;
+  flex-wrap: wrap;
+  /* Allow tabs to wrap on smaller screens */
+}
+
+.tab-button {
+  flex-grow: 1;
+  /* Allow tabs to take up available space */
+  text-align: center;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: transparent;
+  /* Default transparent */
+  color: var(--tab-text-light);
+  font-size: clamp(1rem, calc(1.1rem * var(--base-font-scale)), 1.3rem);
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease, font-size 0.3s ease;
+  /* Prevent text selection */
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.tab-button:hover {
+  background-color: rgba(var(--primary-color-light), 0.1);
+  /* Slight highlight on hover */
+  color: var(--primary-color-light);
+}
+
+.tab-button.active {
+  background-color: var(--tab-active-bg-light);
+  color: var(--tab-active-text-light);
+  font-weight: bold;
+}
+
+.tab-button:active {
+  transform: scale(0.98);
+  /* Slightly shrink when pressed */
+}
+
+
+/* Grid Styling */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* 3 columns, equal width */
+  grid-template-rows: repeat(3, 1fr);
+  /* 3 rows, equal height */
+  gap: 15px;
+  /* Gap between grid items */
+  min-height: 300px;
+  /* Ensure grid has a minimum size */
+  align-items: center;
+  justify-items: center;
+  padding: 10px;
+  border: 1px solid var(--border-color-light);
+  border-radius: 8px;
+  background-color: var(--secondary-color-light);
+  /* Background for the grid area */
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.box {
+  background-color: var(--box-bg-light);
+  color: var(--box-text-light);
+  border: 1px solid var(--box-border-light);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  /* Take full width of grid cell */
+  height: 100%;
+  /* Take full height of grid cell */
+  min-height: 80px;
+  /* Minimum size for boxes */
+  font-size: clamp(1.2rem, calc(1.5rem * var(--base-font-scale)), 2rem);
+  font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, font-size 0.3s ease;
+  /* Add hover/active effects for touch feedback */
+  cursor: pointer;
+  /* Indicate interactive areas (even if not clickable yet) */
+}
+
+.box:hover {
+  transform: translateY(-3px);
+  /* Slight lift on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Touch Feedback: Highlight box on tap */
+.box:active {
+  background-color: var(--primary-color-light);
+  color: var(--button-text-light);
+  transform: scale(0.95);
+  /* Shrink slightly on touch */
+  transition: background-color 0s, color 0s, transform 0.1s ease;
+  /* Faster feedback */
+}
+
+
+.empty {
+  /* Style for empty cells if needed, currently just taking up space */
+  background-color: transparent;
+}
+
+/* Loader Styling */
+.loader {
+  position: absolute;
+  /* Needs positioning context from a parent */
+  /* Assuming .calculator is position: relative or absolute */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--loader-color);
+  animation: spin 1s ease-in-out infinite;
+  z-index: 10;
+  /* Ensure loader is on top */
+  display: none;
+  /* Hidden by default */
+}
+
+.loader.visible {
+  display: block;
+}
+
+/* Custom Scrollbars (Webkit browsers) */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--secondary-color-light);
+  /* Track color */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color-light);
+  /* Thumb color */
+  border-radius: 10px;
+  border: 3px solid var(--secondary-color-light);
+  /* Padding around thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--button-hover-bg-light);
+  /* Darker thumb on hover */
+}
+
+
+/* Animations */
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+/* Advanced Focus Pulse Animation */
+@keyframes focus-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--focus-outline-color, 0, 123, 255), 0.7);
+  }
+
+  100% {
+    box-shadow: 0 0 0 10px rgba(var(--focus-outline-color, 0, 123, 255), 0);
+  }
+}
+
+
+/* Responsive Layout (Example breakpoints) */
+@media (max-width: 768px) {
+  .calculator {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  header h1 {
+    font-size: clamp(1.6rem, calc(1.8rem * var(--base-font-scale)), 2.2rem);
+  }
+
+  header p {
+    font-size: clamp(0.9rem, calc(1rem * var(--base-font-scale)), 1.2rem);
+  }
+
+  form input[type="number"],
+  form button[type="submit"],
+  .tab-button,
+  .box {
+    font-size: clamp(0.9rem, calc(1rem * var(--base-font-scale)), 1.2rem);
+  }
+
+  .grid {
+    gap: 10px;
+    min-height: 250px;
+  }
+
+  .box {
+    min-height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .calculator {
+    padding: 15px;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .tabs {
+    flex-direction: column;
+    gap: 8px;
+    padding: 5px;
+  }
+
+  .tab-button {
+    width: 100%;
+    /* Full width tabs on very small screens */
+  }
+
+  .grid {
+    gap: 8px;
+    min-height: 200px;
+  }
+
+  .box {
+    min-height: 50px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background-color: #fff;
+    color: #000;
+    padding: 0;
+    print-color-adjust: exact;
+    /* Ask browser to print colors */
+    -webkit-print-color-adjust: exact;
+  }
+
+  .calculator {
+    box-shadow: none;
+    border: 1px solid #000;
+    padding: 15px;
+    max-width: 100%;
+    width: auto;
+  }
+
+  header h1 {
+    color: #000;
+  }
+
+  header a,
+  .controls,
+  form button[type="submit"],
+  .tabs,
+  .loader {
+    display: none !important;
+    /* Hide non-essential elements */
+  }
+
+  form {
+    margin-bottom: 15px;
+    display: block;
+    /* Change flex to block for simpler printing */
+  }
+
+  form label,
+  form input[type="number"] {
+    display: inline-block;
+    margin-right: 10px;
+    width: auto;
+    /* Auto width for print */
+  }
+
+  .grid {
+    gap: 5px;
+    min-height: auto;
+    border-color: #000;
+  }
+
+  .box {
+    border-color: #000;
+    color: #000;
+    background-color: #fff;
+    min-height: 50px;
+    height: auto;
+    width: auto;
+    padding: 5px;
+  }
+}
+
+
+/* Animation Keyframes */
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}

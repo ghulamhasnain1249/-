@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="نقش کیلکولیٹر کے ذریعے اپنے اعداد کو خوبصورت انداز میں ترتیب دیں۔">
+    <meta name="keywords" content="نقش، کیلکولیٹر، اسلامی کیلکولیٹر، اعداد کی ترتیب">
+    <meta name="author" content="YourName">
+    <title>نقش کیلکولیٹر - اپنے اعداد کو خوبصورت بنائیں</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" class="css">
+</head>
+<body>
+    <main class="calculator">
+        <header>
+            <h1>نقش تیار کریں</h1>
+            <p>آیت قرآنی یا اسماء الحسنیٰ میں سے کسی کے اعداد لکھیں۔ اگر اعداد موجود نہیں تو <a href="https://ghulamhasnain1249.github.io/Abjad_Calculator/">یہاں</a> کلک کریں</p>
+        </header>
+
+        <!-- Added controls for Theme and Font Size -->
+        <div class="controls">
+            <div class="theme-toggle">
+                <button id="themeToggle">تھیم بدلیں (ڈارک/لائٹ)</button>
+            </div>
+            <div class="font-size-control">
+                <label for="fontSizeSlider">فونٹ سائز:</label>
+                <input type="range" id="fontSizeSlider" min="80" max="150" value="100">
+            </div>
+        </div>
+
+
+        <form onsubmit="event.preventDefault(); generateCross();" id="calculationForm">
+            <label for="userInput">اعداد درج کریں:</label>
+            <input type="number" id="userInput" placeholder="کم از کم 9 لکھیں..." aria-label="Number input for cross shape calculator" required min="9">
+            <button type="submit">بنائیں</button>
+        </form>
+
+        <div class="tabs" role="tablist">
+            <button type="button" class="tab-button active" data-tab="naari" onclick="selectTab('naari')" role="tab" aria-selected="true">ناری</button>
+            <button type="button" class="tab-button" data-tab="hawaai" onclick="selectTab('hawaai')" role="tab" aria-selected="false">ھوائی</button>
+            <button type="button" class="tab-button" data-tab="maai" onclick="selectTab('maai')" role="tab" aria-selected="false">مائی</button>
+            <button type="button" class="tab-button" data-tab="khaki" onclick="selectTab('khaki')" role="tab" aria-selected="false">خاکی</button>
+        </div>
+
+        <section class="grid" id="outputGrid" aria-live="polite" role="grid">
+            <!-- Grid cells will be populated or updated by JavaScript -->
+            <div class="empty" role="none presentation"></div>
+            <div class="box" id="top" aria-label="Top box" role="gridcell"></div>
+            <div class="empty" role="none presentation"></div>
+            <div class="box" id="left" aria-label="Left box" role="gridcell"></div>
+            <div class="box" id="center" aria-label="Center box" role="gridcell"></div>
+            <div class="box" id="right" aria-label="Right box" role="gridcell"></div>
+            <div class="empty" role="none presentation"></div>
+            <div class="box" id="bottom" aria-label="Bottom box" role="gridcell"></div>
+            <div class="empty" role="none presentation"></div>
+        </section>
+
+        <!-- Loader Element -->
+        <div class="loader" id="loader"></div>
+
+    </main>
+
+    <script src="script.js"></script>
+    <!-- Service Worker registration (requires a service-worker.js file) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js') // Assuming service-worker.js is in root
+                    .then(registration => {
+                        console.log('Service Worker registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('Service Worker registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
