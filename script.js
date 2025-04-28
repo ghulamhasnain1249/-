@@ -8,7 +8,26 @@ const loader = document.getElementById('loader');
 const calculationForm = document.getElementById('calculationForm'); // Get form reference
 
 // --- State Variables ---
+// Note: currentTab is managed by the selectTab function now,
+// but we keep it as a state variable for generateCross to use.
 let currentTab = 'naari'; // Default tab, matching your provided logic
+
+// --- Urdu Numeral Converter Function ---
+function toUrduNum(num) {
+    // Ensure input is a non-negative number before converting
+    if (typeof num !== 'number' || isNaN(num) || num < 0) {
+        console.warn(`Invalid number for Urdu conversion: ${num}`);
+        return String(num); // Return the original value or a placeholder
+    }
+    const urduDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    // Convert number to string, split digits, map to Urdu digits, join back
+    return num.toString().split('').map(digit => {
+        const intDigit = parseInt(digit);
+        // Check if it's a digit 0-9, otherwise keep the original character (like a decimal point if needed, or sign)
+        return isNaN(intDigit) ? digit : urduDigits[intDigit];
+    }).join('');
+}
+
 
 // --- Theme Toggle Logic ---
 function setTheme(theme) {
@@ -50,13 +69,21 @@ function triggerShakeAnimation(element) {
 // --- Loader Control ---
 function showLoader() {
     loader.classList.add('visible');
+    // Optional: Disable input/button while loading to prevent multiple submits
+    userInput.disabled = true;
+    calculationForm.querySelector('button[type="submit"]').disabled = true;
+    tabButtons.forEach(btn => btn.disabled = true);
 }
 
 function hideLoader() {
     loader.classList.remove('visible');
+     // Optional: Re-enable input/button after loading
+    userInput.disabled = false;
+    calculationForm.querySelector('button[type="submit"]').disabled = false;
+     tabButtons.forEach(btn => btn.disabled = false);
 }
 
-// --- Tab Management (Integrated your logic) ---
+// --- Tab Management (Using your provided logic for tab state) ---
 function selectTab(tab) {
     // Update state variable
     currentTab = tab;
@@ -75,26 +102,45 @@ function selectTab(tab) {
     });
 
     // Your logic: generate cross when tab changes
-    generateCross();
+    // Only generate if input is potentially valid
+    const input = parseInt(userInput.value.trim(), 10);
+    if (!isNaN(input) && input >= 9) {
+       generateCross();
+    } else {
+        // Clear the grid if input is invalid when switching tabs
+         clearGrid();
+    }
+
 
     // Track analytics event
     trackEvent('Tab', 'Select', tab);
 }
 
-// --- Calculation Logic (Your provided logic integrated) ---
+// Helper to clear the grid boxes
+function clearGrid() {
+    document.getElementById('top').innerText = '';
+    document.getElementById('left').innerText = '';
+    document.getElementById('center').innerText = '';
+    document.getElementById('right').innerText = '';
+    document.getElementById('bottom').innerText = '';
+     document.querySelectorAll('.box').forEach(box => box.classList.remove('calculated'));
+}
+
+
+// --- Calculation Logic (Integrating your calculation with other features) ---
 function generateCross() {
     const inputVal = userInput.value.trim();
     const input = parseInt(inputVal, 10);
 
-    // --- Validation (Enhanced with shake and class toggling) ---
+    // --- Validation (Using the enhanced validation) ---
     // Remove previous validation states
     userInput.classList.remove('error');
     userInput.checkValidity(); // Re-check native validity state
 
     if (!inputVal || isNaN(input) || input < 9) {
-        console.warn("Validation failed: Input must be a number >= 9."); // Use console.warn instead of alert
-        triggerShakeAnimation(userInput); // Trigger CSS shake animation
-        // Optional: Display an error message element if you added one in HTML
+        console.warn("Validation failed: Input must be a number >= 9.");
+        triggerShakeAnimation(userInput);
+        clearGrid(); // Clear grid on validation failure
         hideLoader(); // Ensure loader is hidden if submit fails
         return; // Stop the function
     }
@@ -111,55 +157,40 @@ function generateCross() {
         let q = Math.floor(m / 3);
         let r = m % 3;
 
-        let boxesOrder = []; // Changed variable name from 'boxes' to avoid conflict with the HTML elements later
-
-        switch (currentTab) {
-            case 'naari':
-                boxesOrder = ['top', 'left', 'center', 'right', 'bottom'];
-                break;
-            case 'maai':
-                boxesOrder = ['right', 'bottom', 'center', 'top', 'left'];
-                break;
-            case 'hawaai':
-                boxesOrder = ['left', 'bottom', 'center', 'top', 'right'];
-                break;
-            case 'khaki':
-                boxesOrder = ['bottom', 'right', 'center', 'left', 'top'];
-                break;
-        }
-
-        let values = [q, q + 1, q + 2, q + 3, q + 4];
+        let top = q;
+        let left = q + 1;
+        let center = q + 2;
+        let right = q + 3;
+        let bottom = q + 4;
 
         if (r === 2) {
-            values[2] += 1;
-            values[3] += 1;
-            values[4] += 1;
+            center += 1;
+            right += 1;
+            bottom += 1;
         } else if (r === 1) {
-            values[3] += 1;
-            values[4] += 1;
+            right += 1;
+            bottom += 1;
         }
         // --- End Your Calculation Logic ---
 
 
-        // Update grid boxes with calculated values
-        // Ensure box elements exist before trying to update them
-        boxesOrder.forEach((boxId, index) => {
-            const boxElement = document.getElementById(boxId);
-            if (boxElement) {
-                boxElement.innerText = values[index];
-                 // Optional: Add a class for success state after calculation if needed
-                 boxElement.classList.add('calculated'); // Example class
-            } else {
-                console.error(`Element with ID "${boxId}" not found.`);
-            }
-        });
-
-         // Optional: Remove success state class from all boxes before adding
+        // --- Update Grid Boxes with Urdu Numerals ---
+        // Clear previous success state
          document.querySelectorAll('.box').forEach(box => box.classList.remove('calculated'));
-         boxesOrder.forEach(boxId => {
-             const boxElement = document.getElementById(boxId);
-             if (boxElement) boxElement.classList.add('calculated');
-         });
+
+        document.getElementById('top').innerText = toUrduNum(top);
+        document.getElementById('left').innerText = toUrduNum(left);
+        document.getElementById('center').innerText = toUrduNum(center);
+        document.getElementById('right').innerText = toUrduNum(right);
+        document.getElementById('bottom').innerText = toUrduNum(bottom);
+
+        // Add success state class to updated boxes
+        document.getElementById('top').classList.add('calculated');
+        document.getElementById('left').classList.add('calculated');
+        document.getElementById('center').classList.add('calculated');
+        document.getElementById('right').classList.add('calculated');
+        document.getElementById('bottom').classList.add('calculated');
+        // --- End Update ---
 
 
         hideLoader(); // Hide loader after calculation and updating
@@ -171,7 +202,7 @@ function generateCross() {
 }
 
 
-// --- Accessibility & Keyboard Navigation (Ensuring compatibility with new selectTab) ---
+// --- Accessibility & Keyboard Navigation ---
 function enableKeyboardNavigation() {
     const tabsContainer = document.querySelector('.tabs');
     if (!tabsContainer) return;
@@ -180,18 +211,18 @@ function enableKeyboardNavigation() {
         let currentTabIndex = Array.from(tabButtons).findIndex(button => button.classList.contains('active'));
         let nextTabIndex = -1;
 
-        // Arrow Right (Move to next tab, wraps around)
-        if (event.key === 'ArrowRight' || event.key === 'Left') { // Add Left for RTL direction intuition
-             if (event.key === 'ArrowRight') {
+        // Arrow Right (Move to next tab, wraps around) / Left (for RTL intuition)
+        if (event.key === 'ArrowRight' || event.key === 'Left') {
+             if (event.key === 'ArrowRight') { // Standard LTR behavior for key
                  nextTabIndex = (currentTabIndex + 1) % tabButtons.length;
              } else { // event.key === 'Left'
                  nextTabIndex = (currentTabIndex - 1 + tabButtons.length) % tabButtons.length;
              }
             event.preventDefault(); // Prevent default scroll behavior
         }
-         // Arrow Left (Move to previous tab, wraps around)
-         else if (event.key === 'ArrowLeft' || event.key === 'Right') { // Add Right for RTL intuition
-             if (event.key === 'ArrowLeft') {
+         // Arrow Left (Move to previous tab, wraps around) / Right (for RTL intuition)
+         else if (event.key === 'ArrowLeft' || event.key === 'Right') {
+             if (event.key === 'ArrowLeft') { // Standard LTR behavior for key
                   nextTabIndex = (currentTabIndex - 1 + tabButtons.length) % tabButtons.length;
              } else { // event.key === 'Right'
                   nextTabIndex = (currentTabIndex + 1) % tabButtons.length;
@@ -208,26 +239,13 @@ function enableKeyboardNavigation() {
         }
 
         if (nextTabIndex !== -1) {
-            // Focus the next button
+            // Focus the next button without selecting it immediately
             tabButtons[nextTabIndex].focus();
-             // Note: The `selectTab` function is called by pressing Enter/Space,
-             // not just by focusing. If you wanted focus to also select, you'd call
-             // selectTab here, but that might be less intuitive for users.
         }
     });
 
-     // Add keydown listener to the input for Enter key to submit the form
-     // This is often default behavior for forms with a submit button, but explicit can help.
-     userInput.addEventListener('keydown', (event) => {
-         if (event.key === 'Enter') {
-             // Prevent default Enter behavior (like newline in textareas) if applicable,
-             // although not an issue for type="number".
-             // Trigger form submission or call generateCross directly.
-             // Calling generateCross directly bypasses the native form submit flow (onsubmit).
-             // Let's stick to the form's onsubmit handler by not preventing default.
-             // The onsubmit handler is already configured in HTML.
-         }
-     });
+     // Input field Enter key: Handled by the form's onsubmit attribute
+     // (onsubmit="event.preventDefault(); generateCross();")
 }
 
 
@@ -255,12 +273,12 @@ function initializeCalculator() {
     fontSizeSlider.value = savedFontSize; // Set slider position
     setFontSize(savedFontSize); // Apply the saved size
 
-    // 3. Set initial active tab and generate initial grid
+    // 3. Set initial active tab and potentially generate initial grid
     // Use your `selectTab` function to handle this, which also calls `generateCross`
     // Get the tab marked active in HTML, or default to 'naari'
     const initialActiveTabButton = document.querySelector('.tab-button.active');
     const initialTab = initialActiveTabButton ? initialActiveTabButton.dataset.tab : 'naari';
-    selectTab(initialTab); // This will set currentTab, update classes, and call generateCross
+    selectTab(initialTab); // This will set currentTab, update classes, and potentially call generateCross
 
     // 4. Set initial focus (Optional)
     // userInput.focus(); // Focus the input field on load
@@ -284,24 +302,34 @@ function initializeCalculator() {
      // Add a blur listener to input to trigger validation feedback when user leaves the field
      userInput.addEventListener('blur', () => {
          // Trigger validation checks (native and potentially JS logic)
-         // Only show validation feedback if the field is not empty after blur
-         if (userInput.value.trim() !== '') {
-            const input = parseInt(userInput.value.trim(), 10);
-            if (isNaN(input) || input < 9) {
-                 triggerShakeAnimation(userInput);
-            } else {
-                 // If valid, ensure error class is removed (animationend handles this, but good to be sure)
-                 userInput.classList.remove('error');
-            }
+         const input = parseInt(userInput.value.trim(), 10);
+         // Only trigger shake if the input is not empty AND invalid
+         if (userInput.value.trim() !== '' && (isNaN(input) || input < 9)) {
+              triggerShakeAnimation(userInput);
+              clearGrid(); // Clear grid on blur validation failure
+         } else if (!isNaN(input) && input >= 9) {
+             // If valid on blur, ensure error class is removed and maybe generate if not already
+             userInput.classList.remove('error'); // Animationend usually handles this
+             // Optional: generateCross() here if you want it to update on blur of valid input
+         } else if (userInput.value.trim() === '') {
+             // If empty on blur, clear grid and remove any error states
+             userInput.classList.remove('error');
+             clearGrid();
          }
      });
 
      // Clean up success state class on input focus/change
      userInput.addEventListener('focus', () => {
-          document.querySelectorAll('.box').forEach(box => box.classList.remove('calculated'));
+          // Optionally clear grid values on focus if you want user to start fresh
+          // clearGrid();
+          // Ensure error class is removed on focus so user can fix
+          userInput.classList.remove('error');
      });
+     // Clear success state when input value changes
      userInput.addEventListener('input', () => {
           document.querySelectorAll('.box').forEach(box => box.classList.remove('calculated'));
+          // Optionally clear grid values as input changes
+          // clearGrid();
      });
 
 }
